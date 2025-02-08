@@ -1,6 +1,6 @@
-import React from 'react';
-import '../styles/globals.css';  // Import global styles (TailwindCSS)
-import Header from '../components/Header';  // Default import
+import React from "react";
+import "@/styles/globals.css";
+import Header from "../components/Header";
 
 export default function RootLayout({
   children,
@@ -10,10 +10,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans bg-gray-100">
-        <Header />  {/* Global Header for all pages */}
-        <main className="container mx-auto p-4">
-          {children}  {/* This will render the content of each page */}
-        </main>
+        <Header />
+        <main className="container mx-auto p-4">{children}</main>
       </body>
     </html>
   );

@@ -1,13 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.20.235:3239/api/v1', // Replace with your API URL
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
-    'Content-Type': 'application/json',
-    // Access localStorage only on the client side
-    Authorization: typeof window !== 'undefined' && localStorage.getItem('token') 
-      ? `Bearer ${localStorage.getItem('token')}`
-      : '',
+    "Content-Type": "application/json",
+
+    Authorization:
+      typeof window !== "undefined" && localStorage.getItem("token")
+        ? `Bearer ${localStorage.getItem("token")}`
+        : "",
   },
 });
 

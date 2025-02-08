@@ -1,75 +1,96 @@
 import axiosInstance from "@/utils/axiosInstance";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "@/styles/globals.css";
+import { ErrorResponse } from "@/models/errModel";
 
-interface TaskFormProps {
-  onSubmit: (taskData: any) => void;
-  initialData?: any;
+interface Task {
+  name: string;
+  description: string;
 }
 
-const TaskForm = ({ onSubmit, initialData }: TaskFormProps) => {
-  const [task, setTask] = useState(
-    initialData || { name: "", description: "" }
-  );
+const TaskForm = () => {
+  const [task, setTask] = useState<Task>({ name: "", description: "" });
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setTask((prev: any) => ({ ...prev, [name]: value }));
+    setTask((prevTask) => ({
+      ...prevTask,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(localStorage.getItem('token'));
-
     try {
-      const response = await axiosInstance.post("/todo", task); // Replace with your actual API endpoint
-      // onSubmit(response.data); // Pass the new task data to parent component
-    } catch (error) {
-      console.error("Error submitting task:", error);
+      await axiosInstance.post("/todo", task);
+      toast.success("Task created successfully!");
+      setTask({ name: "", description: "" });
+    } catch (error: unknown) {
+      if ((error as ErrorResponse).response) {
+        toast.error((error as ErrorResponse).response?.data.errorMessage);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     }
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 p-4 border rounded-md shadow-md"
+      className="space-y-6 p-6 border rounded-lg shadow-lg bg-white max-w-md mx-auto"
     >
-      <input
-        type="text"
-        name="name"
-        value={task.name}
-        onChange={handleChange}
-        className="w-full p-2 border rounded-md"
-        placeholder="Task Name"
-        required
-      />
-      <textarea
-        name="description"
-        value={task.description}
-        onChange={handleChange}
-        className="w-full p-2 border rounded-md"
-        placeholder="Task Description"
-        required
-      />
-      <select
-        name="status"
-        value={task.status}
-        onChange={handleChange}
-        className="w-full p-2 border rounded-md"
-      >
-        <option value="Not Started">Not Started</option>
-        <option value="On Progress">On Progress</option>
-        <option value="Done">Done</option>
-        <option value="Reject">Reject</option>
-      </select>
+      <div className="space-y-2">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Task Name
+        </label>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          value={task.name}
+          onChange={handleChange}
+          className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm 
+                     focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all 
+                     text-gray-900"
+          placeholder="Enter task name"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Description
+        </label>
+        <textarea
+          name="description"
+          id="description"
+          value={task.description}
+          onChange={handleChange}
+          className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm 
+                     focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-none 
+                     h-32 transition-all text-gray-900"
+          placeholder="Describe the task details"
+          required
+        />
+      </div>
+
       <button
         type="submit"
-        className="w-full p-2 bg-blue-500 text-white rounded-md"
+        className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium 
+                   rounded-md shadow-sm transition-colors duration-200 focus:outline-none 
+                   focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
-        Submit
+        Create Task
       </button>
     </form>
   );
